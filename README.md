@@ -79,18 +79,60 @@ Despues de invocar el resultado tenemos una primera parte del panel de indicador
 
 ![Capture4](https://github.com/user-attachments/assets/dcb08531-338b-4ac2-a661-685e7ba47788)
 
-A la izquierda se presenta la primera grafica de "Used, Impacted & Most-at-risk". En esta grafica se representan los 3 elementos de analisis principal.
+- A la izquierda se presenta la primera grafica de "Used, Impacted & Most-at-risk". En esta grafica se representan los 3 elementos de analisis principal.
 Donde se nota la diferencia de muestreo de pruebas de elementos usados a elementos en riesgo. La reduccion de objetos Standard a probar es casi 99% y un valor casi igual de elementos Custom (99%) a testear tambien.
 
-En referencia a la grafica "Most-at-risk & Test Coverage" (Hits & Gaps):
+- En referencia a la grafica "Most-at-risk & Test Coverage" (Hits & Gaps):
 
 Una vez identificado el riesgo, LiveCompare lo cruza con tu repositorio de pruebas (como Tosca, Azure DevOps o ALM):
 
-Hits (Azul): Son los objetos "Most-at-risk" que ya tienen un caso de prueba asociado. Estás solo hay 30 casos de prueba asociados.
+- Hits (Azul): Son los objetos "Most-at-risk" que ya tienen un caso de prueba asociado. Estás solo hay 30 casos de prueba asociados.
 
-Gaps (Gris): Son los objetos críticos que no tienen prueba (89). Este es tu plan de trabajo: aquí es donde debes crear nuevos casos de prueba para evitar que algo se rompa en producción.
+- Gaps (Gris): Son los objetos críticos que no tienen prueba (89). Este es tu plan de trabajo: aquí es donde debes crear nuevos casos de prueba para evitar que algo se rompa en producción.
+
+![Capture5](https://github.com/user-attachments/assets/b96c7b17-e51b-48da-b94c-5f567a68d526)
+
+A continuacion describimos cada grafico de la segunda parte del Dashboard:
+
+- Changing Object Summary (Resumen de Objetos en Cambio)
+Este gráfico se enfoca en el origen del cambio (lo que viene en el transporte o la Nota SAP). No te dice qué se rompió, sino qué se modificó.
+
+¿Qué muestra?: Un desglose por tipo de objeto técnico de todo lo que se está moviendo hacia tu sistema (Tablas, Programas ABAP, Clases, Vistas, Elementos de Datos, etc.).
+
+Divisiones Custom vs. Standard: Aquí verás si el cambio es mayormente código propio (Z/Y) o si es un parche de SAP que está modificando objetos estándar.
+
+Utilidad: Sirve para que el equipo de desarrollo identifique el volumen del cambio. Por ejemplo, si ves un volumen alto de "Table Definitions", sabes que habrá cambios en la estructura de datos que podrían afectar muchas consultas.
 
 
+- Most-at-risk & Test Coverage by Type (Más en riesgo y Cobertura por tipo)
+Este gráfico es el más valioso para los líderes de QA y Testing, ya que cruza los objetos en riesgo con tus herramientas de pruebas (como Tosca, ALM o Azure DevOps).
+
+Combina dos dimensiones:
+
+Eje de Objetos (Most-at-risk): Agrupa los objetos que LiveCompare determinó como críticos (los que sí o sí debes probar). Los agrupa por tipo de ejecutable (ej. Transacciones, Reportes, RFCs).
+
+Eje de Cobertura (Test Coverage): Aquí es donde entran los colores:
+
+Hits (Generalmente Verde): Indica que para ese objeto en riesgo ya existe un caso de prueba en tu repositorio. Estás "protegido".
+
+Gaps (Generalmente Rojo): Indica que el objeto está en riesgo pero no tienes ninguna prueba creada para él.
+
+¿Cómo leerlo?
+Si ves una barra larga de Transactions con mucho color Rojo (Gap), significa que tienes un agujero de seguridad funcional enorme en tus transacciones más usadas.
+
+Si la mayoría es Verde (Hit), puedes estar tranquilo porque tu regresión automática o manual ya cubre lo que se va a ver afectado.
+
+- ¿Cómo se conectan estos dos gráficos?
+La relación es de Causa y Efecto:
+
+El Changing Object Summary te dice: "Se están cambiando 10 Clases y 5 Tablas" (La Causa).
+
+El motor de LiveCompare analiza qué transacciones usan esas clases y tablas.
+
+El Most-at-risk & Test Coverage by Type te dice: "Esos cambios en las clases afectan a estas 15 Transacciones. De esas 15, tienes pruebas para 10 (Hits) y te faltan 5 (Gaps)" (El Efecto y la Solución).
+
+- Ejemplo práctico:
+Si en el primer gráfico ves muchos cambios en Table Definitions (Standard), es muy probable que en el segundo gráfico veas un incremento en Transactions (Custom) en riesgo, porque tus desarrollos Z dependen de esas tablas estándar que SAP acaba de modificar.
 
 
 
