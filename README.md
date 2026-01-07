@@ -111,11 +111,13 @@ Combina dos dimensiones:
 
 Eje de Objetos (Most-at-risk): Agrupa los objetos que LiveCompare determinó como críticos (los que sí o sí debes probar). Los agrupa por tipo de ejecutable (ej. Transacciones, Reportes, RFCs).
 
-Eje de Cobertura (Test Coverage): Aquí es donde entran los colores:
+Eje de Cobertura (Test Coverage): Aquí es de donde las barras de colores toman su escala:
 
-Hits (Generalmente Verde): Indica que para ese objeto en riesgo ya existe un caso de prueba en tu repositorio. Estás "protegido".
+Hits (azul): Indica que para ese objeto en riesgo ya existe un caso de prueba en tu repositorio. Estás "protegido".
 
-Gaps (Generalmente Rojo): Indica que el objeto está en riesgo pero no tienes ninguna prueba creada para él.
+Gaps (Azul marino): Indica que el objeto está en riesgo y no tienes ninguna prueba creada para él.
+
+Generalmente los Hits se indican color verde y los Gaps en rojo.
 
 ¿Cómo leerlo?
 Si ves una barra larga de Transactions con mucho color Rojo (Gap), significa que tienes un agujero de seguridad funcional enorme en tus transacciones más usadas.
@@ -133,6 +135,66 @@ El Most-at-risk & Test Coverage by Type te dice: "Esos cambios en las clases afe
 
 - Ejemplo práctico:
 Si en el primer gráfico ves muchos cambios en Table Definitions (Standard), es muy probable que en el segundo gráfico veas un incremento en Transactions (Custom) en riesgo, porque tus desarrollos Z dependen de esas tablas estándar que SAP acaba de modificar.
+
+## Testing Detail Report
+
+![Capture7](https://github.com/user-attachments/assets/bd21812c-bc9e-40be-835b-ff10224d2031)
+
+De ete reporte, lo mas importante son los graficos inferiores "Top 5 Application Areas" y "All, Covering and Optimal Tests". 
+
+- Top 5 Application Areas
+Muestra las 5 areas principales donde nos debemos enfocar a probar. Ademas de todas las pruebas (Azul), las pruebas que cubren el cambio (Rojo) y el subgrupo de pruebas (Verde) que va a impactar inmediatamente en la Calidad de los elementos.
+
+- All, Covering and Optimal Tests
+Esta grafica ya muestra el total de las pruebas que cubre los elementos SAP modificados (columna All), las pruebas a los impactados (columna Covering) y las pruebas optimas (columna Optimal). Mas que tod es un panorama general de la corrida del Smart Impact Analysis.
+
+Ambas graficas son las importantes para los testers ya que estan relacionadas con otras tablas donde se especifican:
+1. las areas donde se realizaron cambios,
+2. las pruebas a los "Most-at-risk",
+3. las pruebas optimas a los "Most-at-risk" y
+4. los "Gaps"
+
+Pestana "Home"
+
+![Capture8](https://github.com/user-attachments/assets/14a398f1-a8a8-4802-aaaa-acb94dee1a45)
+- La columna "ALL" nos indica todos los tests aplicados a las areas (APP_AREA)
+- La columna "COVERING" son las pruebas aplicadas a los "Most-at-risk" 
+- La columna "OPTIMAL" son las pruebas que daran el resultado optimo de covertura.
+- La columna "TEST_GAPS" indica los elementos que todavia no tienen asignadas pruebas.
+
+Pestana "App Area Details" 
+
+![Capture9](https://github.com/user-attachments/assets/02cf2988-8064-4c28-bf62-05aec33f8e47)
+
+Esta pestana despliega el area seleccionada. En este ejemplo tenemos a "Financial Accounting", Algunos elementos importantes en este reporte son:
+
+- TEST_REPOSITORY_NAME: indica el tipo repositorio e indirectamente el tipo de prueba.
+- STATUS: dice que tipo de prueba por importancia esta desplegada (COVERING o OPTIMAL)
+- RISK: el riesgo implicado en el cambio al objeto
+- TEST_PATH: la locacion de la prueba y el ID de la prueba
+
+Pestana "Test Hits & Gaps"
+
+![Capture11](https://github.com/user-attachments/assets/3a8fc8c1-39bc-44dd-8a22-5143e4aacb6d)
+
+Esta pantalla nos indica todos "Hits" y "Gaps" encontrados. Va a ser muy importante enfocarse en los "Gaps" para tener un panora mas completo del testeo aun si sabemos que hemos llevado a cabo "Optimals" y "Covering".
+
+## Conclusiones
+
+- Enfocarse en el recurso de "Testing Detail Report" para tener un panorama acotado de testing.
+  
+- Revisar las 5 Areas de Aplicacion, como prioridad. Verificar el area donde se hagan realizado mas pruebas (All) y donde haya mas considerados "Optimal". Entre mas elementos optimos haya por satisfacer se puede diferir que los cambios implementados en esa area tienen cierta independencia y la funcionalidad del area puede estar en riesgo.
+  
+- Tomar nota de los "Gaps" en la pestana "Home". Hay que validar el hecho de que exite la posibilidad que hay elementos importantes sin pruebas y aunque haya pruebas optimas en buen numero, verificar este detalle nos puede evitar detalles futuros en el funcionamiento del area. Auxiliarse de la pestana "Test Hits & Gaps" donde se enumeran los elementos y su cobertura de pruebas.
+  
+- Verificar los requisitos, procedimientos y politicas de pruebas aplicados al ERP en cuestion de parte del cliente. Pregunta a tu supervisor si hay practicas historicas no documentadas de prioridad de pruebas, ademas de requerimientos de ultimo momento que solo tus superiores conocen.
+
+
+
+
+
+
+
 
 
 
