@@ -1,108 +1,98 @@
-# 💻 Tricentis LiveCompare: Explicacion Smart Start App
+ [Ver version en español](README.es.md)
+
+# 💻 Tricentis LiveCompare: Explanation Smart Start App
 
 
-## 🔄 Ciclo de vida de una Aplicacion ERP
-
-A continuación una representación de cómo se maneja el ciclo
-de vida de la aplicación SAP. Vemos que hay una relación de estrecha entra DEV (Development) y QAS (Quality Assurance), la retroalimentación genera cambios (Changes)
-que DEV implementa y pasa de nuevo a QAS. Las fases terminadas pasan a PRD (Producción) donde ellos retroalimentan a QAS y ellos a DEV formándose un circuito de mejora buscando cumplir con los requerimientos y la satisfacción del cliente.
+## 🔄 ERP Application Lifecycle
+Below is a representation of how the SAP application lifecycle is managed. There is a close relationship between DEV (Development) and QAS (Quality Assurance); feedback generates Changes that DEV implements and sends back to QAS. Completed phases move to PRD (Production), where user feedback is sent to QAS and then back to DEV, forming a continuous improvement circuit aimed at meeting requirements and ensuring customer satisfaction.
 
 
 ![Capture1](https://github.com/user-attachments/assets/111caf96-36f2-4982-870a-15231d5c7387)
 
 
-En cada iteración de cambios hechos por DEV, QAS busca en todo momento reducir el alcance de las pruebas (testing) enfocándose solo en lo que realmente importa.
-En este punto Tricentis desarrolla LiveCompare para determinar qué elementos u objetos probar para reducir el tiempo de pruebas, costo, efectividad del testeo e 
-implementación de cambios en ambientes ERP como SAP u Oracle.
+In each iteration of changes made by DEV, QAS constantly seeks to reduce testing scope by focusing only on what truly matters. At this point, Tricentis developed LiveCompare to determine which elements or objects to test, reducing testing time, cost, and increasing the effectiveness of test execution and change implementation in ERP environments like SAP or Oracle.
 
-## 💼 Descripcion de metodologia LiveCompare
-LiveCompare de Tricentis utiliza una metodología basada en inteligencia artificial y análisis de dependencias para filtrar el universo de objetos en SAP.
-Con esto busca limitar el rango de pruebas, avocándose en aquellos objetos que son primordiales para las pruebas.
-Dado esto, se definen categorías por nivel dado de importancia. El análisis sigue un flujo lógico que va desde el "uso real" hasta el "riesgo crítico":
+## 💼 LiveCompare Methodology Description
+Tricentis LiveCompare uses a methodology based on AI and dependency analysis to filter the SAP object universe. This aims to limit the testing range by focusing on those objects that are essential for validation. Categories are defined by their level of importance, following a logical flow from "actual usage" to "critical risk":
 
 
 ![Capture2](https://github.com/user-attachments/assets/5a90de82-46bb-4a31-9dd2-21f2ef104a99)
 
 
-•	Used (Usados): Son todos los objetos ejecutables (transacciones, reportes, servicios web) que SAP registra como utilizados en un periodo determinado (generalmente los últimos 3 a 12 meses). LiveCompare obtiene esta información del historial de rendimiento (Performance History Data - PHD) del sistema de producción.
+•	Used: All executable objects (transactions, reports, web services) that SAP records as being used in a specific period (usually the last 3 to 12 months). LiveCompare retrieves this from the Performance History Data (PHD) of the production system.
 
-•	Impacted (Impactados): Son aquellos objetos de la categoría "Used" que tienen una relación técnica directa o indirecta con los cambios realizados (por ejemplo, en un transporte o una nota SAP). Si cambias una tabla y un reporte usado la consulta, ese reporte queda "impactado".
+•	Impacted: Objects in the "Used" category that have a direct or indirect technical relationship with the changes made (e.g., in a Transport Request or an SAP Note). If a table is modified and a used report queries it, that report becomes "impacted."
 
-•	Most at Risk (Más en riesgo): Es un subconjunto de los impactados.6 LiveCompare aplica un "sistema experto" para seleccionar los objetos mínimos necesarios que deben probarse para cubrir el 100% del riesgo. Si diez reportes impactados llaman a la misma función modificada, LiveCompare elegirá el más relevante (el "Most at Risk") para optimizar el esfuerzo.
+•	Most at Risk: A subset of the impacted objects. LiveCompare applies an "expert system" to select the minimum necessary objects to be tested to cover 100% of the risk. If ten impacted reports call the same modified function, LiveCompare will choose the most relevant one ("Most at Risk") to optimize the effort.
 
-Tambien se distinguen que en cada barra dos divisiones:
-1. Standard (Objetos Estándar): Se refiere a todos los objetos que son propiedad de SAP.
+Two divisions are also distinguished within each bar:
 
-Identificación: Son objetos cuyos nombres NO comienzan con las letras Z o Y (por ejemplo: la transacción VA01, el programa SAPMV45A o tablas como MARA).
+1- Standard (SAP Standard Objects): Refers to all objects owned by SAP.
 
-Significado en la gráfica: Si tienes muchos objetos estándar en la barra de "Most-at-risk", significa que los cambios (como un Support Pack o una Nota SAP) están afectando los procesos base del sistema. Aquí el riesgo es que una funcionalidad nativa de SAP deje de funcionar.
+Identification: Objects whose names DO NOT start with Z or Y (e.g., transaction VA01, program SAPMV45A, or table MARA).
 
-2. Custom (Objetos Personalizados / Código Z): Se refiere a todos los desarrollos hechos a medida por tu empresa.
+Graph Significance: A high number of standard objects in the "Most-at-risk" bar indicates that changes (like a Support Pack) are affecting the system's core processes. The risk here is that native SAP functionality might fail.
 
-Identificación: Son objetos que comienzan con Z o Y, y que se encuentran en el "Customer Name Range". LiveCompare usa un patrón de nombres (Custom Object Naming Patterns) para identificarlos automáticamente.
+2- Custom (Custom Objects / Z-Code): Refers to all developments tailored by your company.
 
-Significado en la gráfica: Si esta sección es grande en la barra de "Impacted", significa que los cambios técnicos de SAP están "rompiendo" o afectando tus desarrollos propios. Esto es muy común cuando SAP actualiza una función estándar que tu código Z utilizaba.
+Identification: Objects starting with Z or Y, found in the "Customer Name Range." LiveCompare uses Custom Object Naming Patterns to identify them automatically.
 
-### 📏 Relación y Niveles de Importancia
-La importancia de un objeto no es aleatoria; LiveCompare utiliza varios criterios técnicos para priorizarlos:
-
-- Criticalidad de Negocio
-
-  El usuario puede marcar objetos como "Business Critical". Si uno de estos es impactado, automáticamente sube al nivel más alto de riesgo.
-  
-- Profundidad de Búsqueda
-
-  Se refiere a qué tan "cerca" está el cambio del ejecutable. Un cambio en una pantalla (nivel 1) es más directo que un cambio en una función profunda (nivel 5).
-
-- Uso (Frecuencia)
-  
-  Los objetos que se usan miles de veces al día en producción tienen mayor peso que aquellos usados una sola vez al mes.
-
-- Costo Funcional
-  
-  Analiza si el cambio ocurre dentro de la misma área de aplicación (ej. Ventas) o si afecta a otros módulos.
-
-### 📏 El Proceso de "Ranking"
-Cada objeto Most at Risk recibe un rango (High, Medium, Low) basado en la combinación de su profundidad en el código y su frecuencia de uso. Por ejemplo:
-•	Un objeto impactado con Uso Alto y Profundidad Baja (cambio directo) será siempre High Risk.
-•	Un objeto con Uso Bajo y mucha Profundidad (muchos niveles de separación del cambio) será Low Risk.
-
-### 📏 Diferencia entre "Top-Down" y "Bottom-Up"
-LiveCompare adapta su análisis según el volumen de cambios:
-
-•	Bottom-Up: Si hay pocos cambios (<1000 objetos), empieza desde los objetos usados y rastrea hacia abajo para ver si tocan el cambio. Es muy preciso para desarrollos a medida.
-
-•	Top-Down: Si hay muchísimos cambios (como un Support Pack), empieza desde el cambio y rastrea hacia arriba para ver qué ejecutables impacta.
+Graph Significance: If this section is large in the "Impacted" bar, it means SAP technical changes are "breaking" or affecting your own developments. This is common when SAP updates a standard function used by your Z-code.
 
 
-## 📊 Explicacion de un ejemplo de uso de Tricentis LiveCompare Smart Impact Analysis
+### 📏 Relationship and Importance Levels
 
-A continuacion definimos un proceso sencillo de requerir e invocar un reporte dentro del modulo Learning de Tricentis LiveCompare Smart Impact Analysis
+Object importance is not random; LiveCompare uses several technical criteria to prioritize them:
 
-1- El primer paso es crear un nuevo proyecto o "New Variant":
+- Business Criticality: Users can flag objects as "Business Critical." If one is impacted, it automatically jumps to the highest risk level.
+
+- Search Depth: Refers to how "close" the change is to the executable. A change in a screen (Level 1) is more direct than a change in a deep-nested function (Level 5).
+
+- Usage (Frequency): Objects used thousands of times a day in production carry more weight than those used once a month.
+
+- Functional Cost: Analyzes if the change occurs within the same application area (e.g., Sales) or if it affects other modules.
+
+
+## 📏 The Ranking Process
+Each Most at Risk object receives a rank (High, Medium, Low) based on its code depth and usage frequency:
+- An impacted object with High Usage and Low Depth (direct change) will always be High Risk.
+- An object with Low Usage and High Depth (many levels of separation) will be Low Risk.
+
+
+### 📏 "Top-Down" vs. "Bottom-Up"
+LiveCompare adapts its analysis based on the volume of changes:
+
+- Bottom-Up: For fewer changes (<1000 objects), it starts from used objects and traces down to see if they touch the change. Highly accurate for custom developments.
+
+- Top-Down: For massive changes (e.g., Support Packs), it starts from the change and traces up to see which executables are impacted.
+
+
+## 📊 Example: Tricentis LiveCompare Smart Impact Analysis
+Below is a simple process for requesting and invoking a report within the Learning module of Tricentis LiveCompare.
+
+1- The first step is to create a "New Variant":
 
 
 ![Capture3](https://github.com/user-attachments/assets/4caab8e0-ba5f-4ddb-9e40-c79cf3402189)
 
 
-2- Despues de invocar el resultado tenemos una primera parte del panel de indicadores (Dashboard):
-
+2- After running the analysis, we get the first part of the Dashboard:
 
 ![Capture4](https://github.com/user-attachments/assets/dcb08531-338b-4ac2-a661-685e7ba47788)
 
 
-### 📎 Used, Impacted & Most-at-risk 
+### 📎 Used, Impacted & Most-at-risk
 
-- En esta grafica se representan los 3 elementos de analisis principal.
-- Donde se nota la diferencia de muestreo de pruebas de elementos usados a elementos en riesgo. La reduccion de objetos Standard a probar es casi 99% y un valor casi igual de elementos Custom (99%) a testear tambien.
+- This graph represents the three main analysis elements.
+- Note the reduction in testing scope. The reduction for Standard objects to be tested is nearly 99%, with a similar 99% reduction for Custom elements.
 
 ### 📎 Most-at-risk & Test Coverage
 
-- En referencia a la grafica  Una vez identificado el riesgo, LiveCompare lo cruza con tu repositorio de pruebas (como Tosca, Azure DevOps o ALM):
-- Hits (Azul): Son los objetos "Most-at-risk" que ya tienen un caso de prueba asociado. Estás solo hay 30 casos de prueba asociados.
-- Gaps (Gris): Son los objetos críticos que no tienen prueba (89). Este es tu plan de trabajo: aquí es donde debes crear nuevos casos de prueba para evitar que algo se rompa en producción.
+- Once risk is identified, LiveCompare crosses it with your test repository (Tosca, Azure DevOps, or ALM).
+- Hits (Blue): Most-at-risk objects that already have an associated test case.
+- Gaps (Gray): Critical objects without a test. This is your "to-do" list: where new test cases must be created to prevent production issues.
 
-3- A continuacion describimos cada grafico de la segunda parte del Dashboard:
+3- Dashboard Second Part details:
 
 
 ![Capture5](https://github.com/user-attachments/assets/b96c7b17-e51b-48da-b94c-5f567a68d526)
