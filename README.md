@@ -100,46 +100,49 @@ Below is a simple process for requesting and invoking a report within the Learni
 
 ### 📎 Changing Object Summary
 
-- Este gráfico se enfoca en el origen del cambio (lo que viene en el transporte o la Nota SAP). No te dice qué se rompió, sino qué se modificó.
+- Focuses on the source of the change (what's in the transport or SAP Note).
 
-- ¿Qué muestra?: Un desglose por tipo de objeto técnico de todo lo que se está moviendo hacia tu sistema (Tablas, Programas ABAP, Clases, Vistas, Elementos de Datos, etc.).
+- What it shows: A breakdown by technical object type (Tables, ABAP Programs, Classes, etc.).
 
-- Divisiones Custom vs. Standard: Aquí verás si el cambio es mayormente código propio (Z/Y) o si es un parche de SAP que está modificando objetos estándar.
+- Custom vs. Standard: Shows if the change is mostly your own code (Z/Y) or an SAP patch.
 
-- Utilidad: Sirve para que el equipo de desarrollo identifique el volumen del cambio. Por ejemplo, si ves un volumen alto de "Table Definitions", sabes que habrá cambios en la estructura de datos que podrían afectar muchas consultas.
+- Usefulness: It helps the development team identify the volume of change. For example, if you see a high volume of "Table Definitions," you know there will be changes to the data structure that could affect many queries.
 
 ### 📎 Most-at-risk & Test Coverage by Type
 
-Este gráfico es el más valioso para los líderes de QA y Testing, ya que cruza los objetos en riesgo con tus herramientas de pruebas (como Tosca, ALM o Azure DevOps).
+Valuable for QA leaders, crossing risk objects with testing tools (Tosca, ALM o Azure DevOps).
 
-Combina dos dimensiones:
+Combines two dimensions:
 
-1- Eje de Objetos (Most-at-risk): Agrupa los objetos que LiveCompare determinó como críticos (los que sí o sí debes probar). Los agrupa por tipo de ejecutable (ej. Transacciones, Reportes, RFCs).
+1- Object Axis (Most-at-risk): Groups critical objects by type (Transactions, Reports, RFCs).
 
-2- Eje de Cobertura (Test Coverage): Aquí es de donde las barras de colores toman su escala:
+2- Coverage Axis (Test Coverage):
 
-- Hits (azul): Indica que para ese objeto en riesgo ya existe un caso de prueba en tu repositorio. Estás "protegido".
+- Hits (Light Blue): Protected. Test case exists.
 
-- Gaps (Azul marino): Indica que el objeto está en riesgo y no tienes ninguna prueba creada para él.
+- Gaps (Dark Blue): At risk. No test exists. (Note: Generally, Hits are green and Gaps are red in standard configurations).
 
-Generalmente los Hits se indican color verde y los Gaps en rojo.
+Generally, Hits are indicated in red and Gaps in blue.
 
-¿Cómo leerlo?
+How to read it?
 
-- Si ves una barra larga de Transactions con mucho color Rojo (Gap), significa que tienes un agujero de seguridad funcional enorme en tus transacciones más usadas.
+- If you see a long bar of Transactions with a lot of red (Gap), it means you have a huge functional security vulnerability in your most frequently used transactions.
 
-- Si la mayoría es Verde (Hit), puedes estar tranquilo porque tu regresión automática o manual ya cubre lo que se va a ver afectado.
+- If most of it is green (Hit), you can rest assured that your automatic or manual regression already covers what will be affected.
 
-¿Cómo se conectan estos dos gráficos?
+How are these two charts connected?
 
-- La relación es de Causa y Efecto:
-- El Changing Object Summary te dice: "Se están cambiando 10 Clases y 5 Tablas" (La Causa).
-- El motor de LiveCompare analiza qué transacciones usan esas clases y tablas.
-- El Most-at-risk & Test Coverage by Type te dice: "Esos cambios en las clases afectan a estas 15 Transacciones. De esas 15, tienes pruebas para 10 (Hits) y te faltan 5 (Gaps)" (El Efecto y la Solución).
+- The relationship is one of Cause and Effect:
+ 
+- The Changing Object Summary tells you: "10 Classes and 5 Tables are being changed" (The Cause).
 
-Ejemplo práctico:
+- The LiveCompare engine analyzes which transactions use those classes and tables.
 
-Si en el primer gráfico ves muchos cambios en Table Definitions (Standard), es muy probable que en el segundo gráfico veas un incremento en Transactions (Custom) en riesgo, porque tus desarrollos Z dependen de esas tablas estándar que SAP acaba de modificar.
+- The Most-at-risk & Test Coverage by Type tells you: "These class changes affect these 15 Transactions. Of those 15, you have tests for 10 (Hits) and you're missing 5 (Gaps)" (The Effect and the Solution).
+
+Practical example:
+
+If in the first graph you see many changes in Table Definitions (Standard), it's very likely that in the second graph you'll see an increase in Transactions (Custom) at risk, because your custom developments depend on those standard tables that SAP has just modified.
 
 
 ## 🔩🔧 Testing Detail Report
@@ -148,22 +151,28 @@ Si en el primer gráfico ves muchos cambios en Table Definitions (Standard), es 
 ![Capture7](https://github.com/user-attachments/assets/bd21812c-bc9e-40be-835b-ff10224d2031)
 
 
-Este reporte tiene suma importancia para el testing. Su importancia estriba en los gráficos inferiores "Top 5 Application Areas" y "All, Covering and Optimal Tests".
+This report is extremely important for testing. Its importance lies in the graphs below: "Top 5 Application Areas" and "All, Covering and Optimal Tests".
 
 ### ✏ Top 5 Application Areas
 
-Muestra las 5 areas principales donde nos debemos enfocar a probar. Ademas de todas las pruebas (Azul), las pruebas que cubren el cambio (Rojo) y el subgrupo de pruebas (Verde) que va a impactar inmediatamente en la Calidad de los elementos.
+Shows the top 5 areas to focus testing on, including All tests (Blue), Covering tests (Red), and Optimal tests (Green).
 
 ### 🖊 All, Covering and Optimal Tests
 
-Esta grafica ya muestra el total de las pruebas que cubre los elementos SAP modificados (columna All), las pruebas a los impactados (columna Covering) y las pruebas optimas (columna Optimal). Mas que todo es un panorama general de la corrida del Smart Impact Analysis.
+A general overview of the Smart Impact Analysis run:
 
-Ambas graficas son las importantes para los testers ya que están relacionadas con otras tablas donde se especifican:
+- All: Total tests covering modified SAP elements.
 
-1. las áreas donde se realizaron cambios,
-2. las pruebas a los "Most-at-risk",
-3. las pruebas óptimas a los "Most-at-risk" y
-4. los "Gaps"
+- Covering: Tests for impacted objects.
+
+- Optimal: The most efficient test set.
+
+Both graphs are important for testers because they are related to other tables that specify:
+
+1. the areas where changes were made,
+2. the most-at-risk tests,
+3. the optimal most-at-risk tests, and
+4. the gaps.
 
 ### 🖋 "Home" Tab
 
@@ -171,10 +180,10 @@ Ambas graficas son las importantes para los testers ya que están relacionadas c
 ![Capture8](https://github.com/user-attachments/assets/14a398f1-a8a8-4802-aaaa-acb94dee1a45)
 
 
-- La columna "ALL" nos indica todos los tests aplicados a las areas (APP_AREA)
-- La columna "COVERING" son las pruebas aplicadas a los "Most-at-risk" 
-- La columna "OPTIMAL" son las pruebas que daran el resultado optimo de covertura.
-- La columna "TEST_GAPS" indica los elementos que todavia no tienen asignadas pruebas.
+- ALL: All tests applied to areas (APP_AREA).
+- COVERING: Tests applied to "Most-at-risk".
+- OPTIMAL: Tests providing the most efficient coverage.
+- TEST_GAPS: Elements without assigned tests.
 
 
 ### 🖌 "App Area Details" Tab
@@ -183,12 +192,12 @@ Ambas graficas son las importantes para los testers ya que están relacionadas c
 ![Capture9](https://github.com/user-attachments/assets/02cf2988-8064-4c28-bf62-05aec33f8e47)
 
 
-Esta pestana despliega el area seleccionada. En este ejemplo tenemos a "Financial Accounting", Algunos elementos importantes en este reporte son:
+Displays the selected area (e.g., Financial Accounting). Key fields:
 
-- TEST_REPOSITORY_NAME: indica el tipo repositorio e indirectamente el tipo de prueba.
-- STATUS: dice que tipo de prueba por importancia esta desplegada (COVERING o OPTIMAL)
-- RISK: el riesgo implicado en el cambio al objeto
-- TEST_PATH: la locacion de la prueba y el ID de la prueba
+- TEST_REPOSITORY_NAME: Type of repository/test.
+- STATUS: Importance (COVERING or OPTIMAL).
+- RISK: Risk level of the change.
+- TEST_PATH: Location and ID of the test.
 
 
 ### 🖍 "Test Hits & Gaps" Tab
@@ -197,20 +206,18 @@ Esta pestana despliega el area seleccionada. En este ejemplo tenemos a "Financia
 ![Capture11](https://github.com/user-attachments/assets/3a8fc8c1-39bc-44dd-8a22-5143e4aacb6d)
 
 
-Esta pantalla nos indica todos "Hits" y "Gaps" encontrados. Va a ser muy importante enfocarse en los "Gaps" para tener un panora mas completo del testeo aun si sabemos que hemos llevado a cabo "Optimals" y "Covering".
+Lists all found Hits and Gaps. It is vital to focus on Gaps to ensure full coverage even if "Optimal" tests are executed.
 
 
-## 📝🗄 Conclusiones
+## 📝🗄 Conclusions
 
+- Focus on the Testing Detail Report for a narrow testing scope.
 
-- Enfocarse en el recurso de "Testing Detail Report" para tener un panorama acotado de testing.
-  
-- Revisar las 5 Areas de Aplicación, como prioridad. Verificar el área donde se hagan realizado más pruebas (All) y donde haya más considerados "Optimal". Entre más elementos óptimos haya por satisfacer se puede diferir que los cambios implementados en esa área tienen cierta independencia y la funcionalidad del área puede estar en riesgo.
-  
-- Tomar nota de los "Gaps" en la pestaña "Home". Hay que validar el hecho de que existe la posibilidad que hay elementos importantes sin pruebas y aunque haya pruebas optimas en buen número, verificar este detalle nos puede evitar detalles futuros en el funcionamiento del área. Auxiliarse de la pestaña "Test Hits & Gaps" donde se enumeran los elementos y su cobertura de pruebas.
-  
-- Verificar los requisitos, procedimientos y políticas de pruebas aplicados al ERP en cuestión de parte del cliente. Pregunta a tu supervisor si hay practicas históricas no documentadas de prioridad de pruebas, además de requerimientos de último momento que solo tus superiores conocen.
+- Prioritize the Top 5 Application Areas. If an area has many "Optimal" tests, its changes might be independent, risking the area's overall functionality.
 
+- Monitor Gaps in the "Home" tab to ensure no critical elements are left untested.
+
+- Verify client-specific ERP testing procedures and ask supervisors for undocumented historical practices or last-minute requirements.
 
 
 
